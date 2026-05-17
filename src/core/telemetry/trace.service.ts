@@ -33,6 +33,7 @@ export class TraceService {
       outputs: input.output ? { payload: input.output } : undefined,
       error: input.error,
       project_name: env.LANGSMITH_PROJECT,
+      end_time: Date.now(),
       extra: {
         metadata: {
           traceId: input.traceId,
