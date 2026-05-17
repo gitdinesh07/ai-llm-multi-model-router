@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS llm_router;
+CREATE DATABASE llm_router;

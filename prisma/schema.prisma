@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum ApiKeyStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum BudgetPeriod {
+  MONTHLY
+}
+
+enum RequestStatus {
+  SUCCESS
+  FAILED
+  DENIED
+}
+
+model User {
+  id             Int                @id @default(autoincrement())
+  email          String             @unique
+  name           String
+  status         UserStatus         @default(ACTIVE)
+  isAdmin        Boolean            @default(false)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  apiKeys        ApiKey[]
+  modelAccess    UserModelAccess[]
+  usageBudget    UsageBudget?
+  llmRequests    LlmRequest[]
+  quotaEvents    QuotaEvent[]
+
+  @@map("users")
+}
+
+model ApiKey {
+  id           Int          @id @default(autoincrement())
+  keyPrefix    String
+  keyHash      String
+  status       ApiKeyStatus @default(ACTIVE)
+  lastUsedAt   DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("api_keys")
+}
+
+model ProviderModel {
+  id           Int               @id @default(autoincrement())
+  provider     String
+  model        String
+  enabled      Boolean           @default(true)
+  metadataJson String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  accessors    UserModelAccess[]
+
+  @@unique([provider, model])
+  @@map("provider_models")
+}
+
+model UserModelAccess {
+  id              Int            @id @default(autoincrement())
+  userId          Int
+  providerModelId Int
+  createdAt       DateTime       @default(now())
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerModel   ProviderModel  @relation(fields: [providerModelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, providerModelId])
+  @@map("user_model_access")
+}
+
+model UsageBudget {
+  id             Int          @id @default(autoincrement())
+  userId         Int          @unique
+  period         BudgetPeriod @default(MONTHLY)
+  tokenLimit     Int
+  consumedTokens Int          @default(0)
+  resetAt        DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("usage_budgets")
+}
+
+model LlmRequest {
+  id               Int           @id @default(autoincrement())
+  userId           Int
+  provider         String
+  model            String
+  requestId        String        @unique
+  traceId          String
+  status           RequestStatus
+  promptTokens     Int           @default(0)
+  completionTokens Int           @default(0)
+  totalTokens      Int           @default(0)
+  latencyMs        Int
+  errorMessage     String?
+  metadataJson     String?
+  createdAt        DateTime      @default(now())
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([provider, model, createdAt])
+  @@map("llm_requests")
+}
+
+model QuotaEvent {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  requestId  String
+  reason     String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("quota_events")
+}
