@@ -19,6 +19,7 @@ import { logger } from "./infra/logging/logger.js";
 import { createV1Router } from "./api/routes/v1.js";
 import { LlmController } from "./api/controllers/llm.controller.js";
 import { AdminController } from "./api/controllers/admin.controller.js";
+import { UserController } from "./api/controllers/user.controller.js";
 import { requestContextMiddleware } from "./api/middleware/request-context.middleware.js";
 import { errorMiddleware } from "./api/middleware/error.middleware.js";
 import { ProviderRegistry } from "./providers/provider-registry.js";
@@ -43,6 +44,7 @@ export function createApp() {
   const llmService = new LlmService(providerRegistry, modelPolicyService, usageService, traceService);
   const llmController = new LlmController(llmService, modelPolicyService);
   const adminController = new AdminController(userService, usageService);
+  const userController = new UserController(llmService, modelPolicyService);
 
   app.use(cors());
   app.use(express.json({ limit: "2mb" }));
@@ -77,7 +79,8 @@ export function createApp() {
     authService,
     adminApiKey: env.ADMIN_API_KEY,
     llmController,
-    adminController
+    adminController,
+    userController
   }));
 
   app.use(errorMiddleware);

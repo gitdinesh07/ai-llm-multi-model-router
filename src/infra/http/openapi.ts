@@ -11,7 +11,8 @@ export const openApiDocument = {
   tags: [
     { name: "Infra" },
     { name: "Inference" },
-    { name: "Admin" }
+    { name: "Admin" },
+    { name: "User" }
   ],
   components: {
     securitySchemes: {
@@ -138,6 +139,14 @@ export const openApiDocument = {
         tags: ["Infra"],
         summary: "Prometheus metrics",
         responses: { "200": { description: "Prometheus metrics output" } }
+      }
+    },
+    "/v1/me": {
+      get: {
+        tags: ["User"],
+        summary: "Get current user profile, allowed models, and available providers",
+        security: [{ ApiKeyAuth: [] }],
+        responses: { "200": { description: "User details including allowed models and providers" } }
       }
     },
     "/v1/models": {

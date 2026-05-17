@@ -18,13 +18,13 @@ export const inferenceRequestSchema = z.object({
 export const createUserSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
-  tokenLimit: z.number().int().positive(),
+  tokenLimit: z.number().int().nonnegative(),
   isAdmin: z.boolean().optional()
 });
 
 export const updatePolicySchema = z.object({
   status: z.enum(["ACTIVE", "BLOCKED"]).optional(),
-  tokenLimit: z.number().int().positive().optional(),
+  tokenLimit: z.number().int().nonnegative().optional(),
   allowedModels: z.array(z.object({
     provider: z.string().min(1),
     model: z.string().min(1)
