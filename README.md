@@ -32,6 +32,7 @@ Vendor-independent LLM routing service built with `Node.js`, `TypeScript`, and `
 5. Seed provider models with `npm run prisma:seed`
 6. Start the service with `npm run dev`
 7. Open Swagger UI at `http://localhost:3000/docs`
+8. Run a live route smoke test with `npm run smoke:test`
 
 ## Auth model
 - Client apps call inference endpoints with `x-api-key`

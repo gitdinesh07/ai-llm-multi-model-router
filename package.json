@@ -9,6 +9,7 @@
     "start": "node dist/src/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "smoke:test": "node scripts/smoke-test.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
