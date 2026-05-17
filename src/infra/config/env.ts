@@ -9,9 +9,9 @@ const envSchema = z.object({
   ADMIN_API_KEY: z.string().min(1),
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_BASE_URL: z.string().default("https://api.openai.com/v1"),
-  OPENAI_DEFAULT_MODELS: z.string().default("gpt-4o-mini,gpt-4.1-mini"),
+  OPENAI_DEFAULT_MODELS: z.string().default(""),
   OLLAMA_BASE_URL: z.string().default("http://localhost:11434"),
-  OLLAMA_DEFAULT_MODELS: z.string().default("codellama:latest,gemma3:1b"),
+  OLLAMA_DEFAULT_MODELS: z.string().default(""),
   LANGSMITH_API_KEY: z.string().optional(),
   LANGSMITH_PROJECT: z.string().default("llm-router"),
   METRICS_PREFIX: z.string().default("llm_router_")

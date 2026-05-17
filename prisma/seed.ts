@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   const defaults = [
-    ...parseModels("openai", process.env.OPENAI_DEFAULT_MODELS ?? "gpt-4o-mini,gpt-4.1-mini"),
-    ...parseModels("ollama", process.env.OLLAMA_DEFAULT_MODELS ?? "codellama:latest,gemma3:1b")
+    ...parseModels("openai", process.env.OPENAI_DEFAULT_MODELS ?? ""),
+    ...parseModels("ollama", process.env.OLLAMA_DEFAULT_MODELS ?? "")
   ];
 
   for (const item of defaults) {

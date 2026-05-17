@@ -15,8 +15,9 @@ export function createV1Router(params: {
   const router = Router();
 
   router.get("/me", apiKeyAuthMiddleware(params.authService), params.userController.me);
-  
-  router.get("/providers", apiKeyAuthMiddleware(params.authService), params.llmController.listProviders);
+
+  // router.get("/providers", apiKeyAuthMiddleware(params.authService), params.llmController.listProviders);
+  router.get("/providers", apiKeyAuthMiddleware(params.authService), params.adminController.listProviders);
   router.get("/models", apiKeyAuthMiddleware(params.authService), params.llmController.listModels);
   router.post("/inference", apiKeyAuthMiddleware(params.authService), params.llmController.generate);
   router.post("/inference/stream", apiKeyAuthMiddleware(params.authService), params.llmController.stream);
@@ -25,6 +26,7 @@ export function createV1Router(params: {
   router.post("/admin/users/:id/keys", adminApiKeyMiddleware(params.adminApiKey), params.adminController.createApiKey);
   router.patch("/admin/users/:id/policy", adminApiKeyMiddleware(params.adminApiKey), params.adminController.updatePolicy);
   router.get("/admin/usage", adminApiKeyMiddleware(params.adminApiKey), params.adminController.usage);
+  router.get("/admin/providers", adminApiKeyMiddleware(params.adminApiKey), params.adminController.listProviders);
 
   return router;
 }

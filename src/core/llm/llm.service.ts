@@ -13,6 +13,7 @@ type ProviderCatalogEntry = {
   models: Array<{
     name: string;
     accessible: boolean;
+    metadata?: Record<string, unknown>;
   }>;
   error?: string;
 };
@@ -193,9 +194,10 @@ export class LlmService {
         return {
           provider: provider.name,
           status: "available" as const,
-          models: models.map((name) => ({
-            name,
-            accessible: accessibleSet.has(name)
+          models: models.map((info) => ({
+            name: info.name,
+            accessible: accessibleSet.has(info.name),
+            metadata: info.metadata
           }))
         };
       } catch (error) {

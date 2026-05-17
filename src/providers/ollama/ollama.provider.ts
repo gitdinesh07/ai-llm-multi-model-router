@@ -4,13 +4,14 @@ import type {
   GenerationRequest,
   GenerationResponse,
   LLMProvider,
-  StreamChunk
+  StreamChunk,
+  ProviderModelInfo
 } from "../shared/provider.types.js";
 
 export class OllamaProvider implements LLMProvider {
   readonly name = "ollama";
 
-  async listModels(): Promise<string[]> {
+  async listModels(): Promise<ProviderModelInfo[]> {
     const response = await fetch(`${env.OLLAMA_BASE_URL}/api/tags`, {
       method: "GET"
     });
@@ -20,13 +21,26 @@ export class OllamaProvider implements LLMProvider {
     }
 
     const payload = await response.json();
-    const models = Array.isArray(payload.models)
+    const models: ProviderModelInfo[] = Array.isArray(payload.models)
       ? payload.models
-          .map((entry: { name?: string; model?: string }) => entry.name ?? entry.model)
-          .filter((value: string | undefined): value is string => Boolean(value))
+        .map((entry: any) => {
+          const name = entry.name ?? entry.model;
+          if (!name) return null;
+          return {
+            name,
+            metadata: {
+              parameterSize: entry.details?.parameter_size,
+              quantizationLevel: entry.details?.quantization_level,
+              family: entry.details?.family,
+              specialization: "Local execution / Private AI",
+              useCases: ["Offline inference", "Cost-free experimentation", "Privacy-first processing"]
+            }
+          };
+        })
+        .filter((value: any): value is ProviderModelInfo => Boolean(value))
       : [];
 
-    return models.length > 0 ? models : env.ollamaDefaultModels;
+    return models.length > 0 ? models : env.ollamaDefaultModels.map((name) => ({ name }));
   }
 
   async generate(input: GenerationRequest): Promise<GenerationResponse> {

@@ -294,6 +294,53 @@ export const openApiDocument = {
         security: [{ AdminApiKeyAuth: [] }],
         responses: { "200": { description: "Usage summary" } }
       }
+    },
+    "/v1/admin/providers": {
+      get: {
+        tags: ["Admin"],
+        summary: "List all globally available providers and their native models",
+        security: [{ AdminApiKeyAuth: [] }],
+        responses: { 
+          "200": { 
+            description: "Global provider and model list",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          provider: { type: "string" },
+                          status: { type: "string", enum: ["available", "unavailable"] },
+                          models: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                name: { type: "string" },
+                                metadata: {
+                                  type: "object",
+                                  additionalProperties: true
+                                }
+                              }
+                            }
+                          },
+                          error: { type: "string" }
+                        }
+                      }
+                    },
+                    requestId: { type: "string" },
+                    traceId: { type: "string" }
+                  }
+                }
+              }
+            }
+          } 
+        }
+      }
     }
   }
 } as const;

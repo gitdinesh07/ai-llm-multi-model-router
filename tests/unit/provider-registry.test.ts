@@ -5,7 +5,7 @@ describe("ProviderRegistry", () => {
   it("resolves a provider by name", () => {
     const registry = new ProviderRegistry([{
       name: "openai",
-      listModels: async () => ["gpt-4o-mini"],
+      listModels: async () => [{ name: "gpt-4o-mini" }],
       generate: async () => ({
         provider: "openai",
         model: "gpt-4o-mini",

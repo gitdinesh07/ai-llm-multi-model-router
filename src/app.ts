@@ -43,7 +43,7 @@ export function createApp() {
   ]);
   const llmService = new LlmService(providerRegistry, modelPolicyService, usageService, traceService);
   const llmController = new LlmController(llmService, modelPolicyService);
-  const adminController = new AdminController(userService, usageService);
+  const adminController = new AdminController(userService, usageService, providerRegistry);
   const userController = new UserController(llmService, modelPolicyService);
 
   app.use(cors());

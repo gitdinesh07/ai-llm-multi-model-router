@@ -2,11 +2,13 @@ import type { Request, Response, NextFunction } from "express";
 import { createUserSchema, updatePolicySchema } from "../../core/llm/llm.schemas.js";
 import { UsageService } from "../../core/usage/usage.service.js";
 import { UserService } from "../../core/users/user.service.js";
+import { ProviderRegistry } from "../../providers/provider-registry.js";
 
 export class AdminController {
   constructor(
     private readonly userService: UserService,
-    private readonly usageService: UsageService
+    private readonly usageService: UsageService,
+    private readonly providerRegistry: ProviderRegistry
   ) {}
 
   createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -45,6 +47,36 @@ export class AdminController {
     try {
       const usage = await this.usageService.getUsageSummary();
       res.json({ data: usage, requestId: req.requestId, traceId: req.traceId });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  listProviders = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const providers = this.providerRegistry.all();
+      const results = await Promise.all(providers.map(async (provider) => {
+        try {
+          const models = await provider.listModels();
+          return {
+            provider: provider.name,
+            status: "available",
+            models: models.map((info) => ({ name: info.name, metadata: info.metadata }))
+          };
+        } catch (error) {
+          return {
+            provider: provider.name,
+            status: "unavailable",
+            models: [],
+            error: error instanceof Error ? error.message : "Provider discovery failed"
+          };
+        }
+      }));
+
+      // Sort results alphabetically by provider name
+      results.sort((left, right) => left.provider.localeCompare(right.provider));
+
+      res.json({ data: results, requestId: req.requestId, traceId: req.traceId });
     } catch (error) {
       next(error);
     }

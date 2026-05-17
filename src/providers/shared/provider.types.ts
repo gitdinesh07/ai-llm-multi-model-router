@@ -31,9 +31,21 @@ export type StreamChunk = {
   finishReason?: string;
 };
 
+export type ProviderModelInfo = {
+  name: string;
+  metadata?: {
+    parameterSize?: string;
+    quantizationLevel?: string;
+    family?: string;
+    specialization?: string;
+    useCases?: string[];
+    [key: string]: unknown;
+  };
+};
+
 export interface LLMProvider {
   readonly name: string;
-  listModels(): Promise<string[]>;
+  listModels(): Promise<ProviderModelInfo[]>;
   generate(input: GenerationRequest): Promise<GenerationResponse>;
   streamGenerate(input: GenerationRequest): AsyncGenerator<StreamChunk, void, void>;
 }

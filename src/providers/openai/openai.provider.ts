@@ -4,14 +4,32 @@ import type {
   GenerationRequest,
   GenerationResponse,
   LLMProvider,
-  StreamChunk
+  StreamChunk,
+  ProviderModelInfo
 } from "../shared/provider.types.js";
 
 export class OpenAIProvider implements LLMProvider {
   readonly name = "openai";
 
-  async listModels(): Promise<string[]> {
-    return env.openAiDefaultModels;
+  async listModels(): Promise<ProviderModelInfo[]> {
+    return env.openAiDefaultModels.map((name) => {
+      let specialization = "General Purpose Cloud AI";
+      let useCases = ["Text generation", "Data extraction"];
+
+      if (name.includes("gpt-4")) {
+        specialization = "Advanced Reasoning & Complex Logic";
+        useCases = ["Coding", "Complex data analysis", "Creative writing"];
+      }
+
+      return {
+        name,
+        metadata: {
+          specialization,
+          useCases,
+          family: "GPT"
+        }
+      };
+    });
   }
 
   async generate(input: GenerationRequest): Promise<GenerationResponse> {
